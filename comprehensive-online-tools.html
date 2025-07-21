@@ -1,0 +1,3655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Tools - Complete Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'blue-gradient-start': '#3b82f6',
+                        'blue-gradient-end': '#1e40af',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .active-tool {
+            display: block;
+        }
+        .hidden-tool {
+            display: none;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-label {
+            cursor: pointer;
+            display: block;
+            padding: 16px;
+            background: #f8fafc;
+            color: #374151;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .file-label:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .copy-feedback {
+            position: relative;
+        }
+        .copy-feedback:after {
+            content: 'Copied!';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-feedback.show:after {
+            opacity: 1;
+        }
+        .error-message {
+            color: #ef4444;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .success-message {
+            color: #10b981;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        
+        /* Keyboard shortcut styles */
+        .shortcut-feedback {
+            z-index: 1000;
+        }
+        
+        /* QR Code container styles */
+        .qr-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .qr-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .qr-download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .qr-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Text diff styles */
+        .text-diff-container {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        
+        .diff-line {
+            font-family: monospace;
+            padding: 2px 8px;
+            margin: 1px 0;
+            border-radius: 2px;
+        }
+        
+        .diff-line.unchanged {
+            background: #f8f9fa;
+        }
+        
+        .diff-line.added {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .diff-line.removed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .diff-line .line-number {
+            display: inline-block;
+            width: 50px;
+            text-align: right;
+            margin-right: 10px;
+            opacity: 0.6;
+            font-size: 12px;
+        }
+        
+        .diff-line .line-content {
+            white-space: pre;
+        }
+        
+        kbd {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.75rem;
+        }
+        
+        .shortcuts-modal {
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Animation for shortcut indicators */
+        button:hover kbd {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+        
+        /* Syntax Highlighting Styles */
+        .syntax-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 16px 0;
+            position: relative;
+            background: #f8f9fa;
+        }
+        
+        .syntax-container pre {
+            margin: 0 !important;
+            padding: 16px !important;
+            overflow: auto;
+            max-height: 500px;
+            background: transparent !important;
+        }
+        
+        .syntax-container code {
+            background: transparent !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .syntax-container.with-line-numbers .line-number {
+            display: inline-block;
+            width: 40px;
+            text-align: right;
+            margin-right: 16px;
+            color: #6b7280;
+            user-select: none;
+            border-right: 1px solid #e5e7eb;
+            padding-right: 8px;
+        }
+        
+        .syntax-container.with-line-numbers .line-content {
+            display: inline-block;
+            width: calc(100% - 56px);
+        }
+        
+        .syntax-buttons {
+            display: flex;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .syntax-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .syntax-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        .syntax-btn:active {
+            background: #f3f4f6;
+        }
+        
+        .detected-language {
+            padding: 8px 16px;
+            background: #eff6ff;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #1e40af;
+        }
+        
+        .syntax-highlighted {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            font-family: inherit !important;
+        }
+        
+        /* Theme overrides */
+        .syntax-container.github {
+            background: #ffffff;
+        }
+        
+        .syntax-container.monokai {
+            background: #272822;
+        }
+        
+        .syntax-container.vs {
+            background: #ffffff;
+        }
+        
+        .syntax-container.atom-one-dark {
+            background: #282c34;
+        }
+        
+        .syntax-container.default {
+            background: #f8f9fa;
+        }
+        
+        /* Ensure proper contrast for different themes */
+        .syntax-container.monokai .syntax-buttons,
+        .syntax-container.atom-one-dark .syntax-buttons {
+            background: rgba(0, 0, 0, 0.3);
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .syntax-container.monokai .syntax-btn,
+        .syntax-container.atom-one-dark .syntax-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .syntax-container.monokai .detected-language,
+        .syntax-container.atom-one-dark .detected-language {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8 px-4">
+        <div class="max-w-6xl mx-auto text-center relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Online Tools</h1>
+            <p class="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
+                Online tools offer many functions for hashing, encoding, decoding, encryption, decryption, formatting, generating and so on. Examples include MD5, SHA-256, SHA-512, SHA-3, Keccak, Base64, Base32, JSON, XML, and QR code and much more related tools.
+            </p>
+            <!-- Keyboard shortcuts indicator -->
+            <button onclick="showShortcutsHelp()" class="absolute top-0 right-0 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-2 rounded-lg transition-all duration-200 text-sm">
+                ⌨️ Shortcuts <kbd class="bg-white bg-opacity-20 px-1 rounded text-xs">Ctrl+Shift+H</kbd>
+            </button>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4">
+            <!-- Search Bar -->
+            <div class="py-4 border-b border-gray-100">
+                <div class="relative max-w-md mx-auto">
+                    <input type="text" id="search-input" placeholder="Search tools... (Ctrl+F)" 
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           oninput="searchTools(this.value)">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <kbd class="bg-gray-100 px-1 rounded text-xs text-gray-500">Ctrl+F</kbd>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Category Buttons -->
+            <div class="flex flex-wrap gap-2 py-4">
+                <button onclick="showCategory('all')" class="category-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">All Tools</button>
+                <button onclick="showCategory('hash')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Hash</button>
+                <button onclick="showCategory('cryptography')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Cryptography</button>
+                <button onclick="showCategory('encoding')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Encoding</button>
+                <button onclick="showCategory('format')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Format</button>
+                <button onclick="showCategory('convert')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Convert</button>
+                <button onclick="showCategory('others')" class="category-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">Others</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Tools Grid -->
+        <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+            <!-- Hash Tools -->
+            <!-- CRC -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">CRC</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate CRC checksums</p>
+                <button onclick="showTool('crc')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- MD Family -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD2</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD2 hash</p>
+                <button onclick="showTool('md2')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD2 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD2 hash from file</p>
+                <button onclick="showTool('md2_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD4</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD4 hash</p>
+                <button onclick="showTool('md4')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD4 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD4 hash from file</p>
+                <button onclick="showTool('md4_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD5</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD5 hash</p>
+                <button onclick="showTool('md5')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">MD5 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate MD5 hash from file</p>
+                <button onclick="showTool('md5_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- SHA1 -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA1</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA1 hash</p>
+                <button onclick="showTool('sha1')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA1 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA1 hash from file</p>
+                <button onclick="showTool('sha1_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- SHA2 -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA224</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA224 hash</p>
+                <button onclick="showTool('sha224')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA224 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA224 hash from file</p>
+                <button onclick="showTool('sha224_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA256 hash</p>
+                <button onclick="showTool('sha256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA256 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA256 hash from file</p>
+                <button onclick="showTool('sha256_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Double SHA256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate double SHA256 hash</p>
+                <button onclick="showTool('double_sha256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- SHA2-512 -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA384</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA384 hash</p>
+                <button onclick="showTool('sha384')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA384 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA384 hash from file</p>
+                <button onclick="showTool('sha384_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512 hash</p>
+                <button onclick="showTool('sha512')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512 hash from file</p>
+                <button onclick="showTool('sha512_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512/224</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512/224 hash</p>
+                <button onclick="showTool('sha512_224')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512/224 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512/224 hash from file</p>
+                <button onclick="showTool('sha512_224_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512/256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512/256 hash</p>
+                <button onclick="showTool('sha512_256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA512/256 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA512/256 hash from file</p>
+                <button onclick="showTool('sha512_256_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- SHA3 -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-224</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-224 hash</p>
+                <button onclick="showTool('sha3_224')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-224 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-224 hash from file</p>
+                <button onclick="showTool('sha3_224_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-256 hash</p>
+                <button onclick="showTool('sha3_256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-256 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-256 hash from file</p>
+                <button onclick="showTool('sha3_256_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-384</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-384 hash</p>
+                <button onclick="showTool('sha3_384')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-384 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-384 hash from file</p>
+                <button onclick="showTool('sha3_384_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-512</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-512 hash</p>
+                <button onclick="showTool('sha3_512')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHA3-512 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHA3-512 hash from file</p>
+                <button onclick="showTool('sha3_512_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Keccak -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-224</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-224 hash</p>
+                <button onclick="showTool('keccak_224')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-224 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-224 hash from file</p>
+                <button onclick="showTool('keccak_224_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-256 hash</p>
+                <button onclick="showTool('keccak_256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-256 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-256 hash from file</p>
+                <button onclick="showTool('keccak_256_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-384</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-384 hash</p>
+                <button onclick="showTool('keccak_384')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-384 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-384 hash from file</p>
+                <button onclick="showTool('keccak_384_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-512</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-512 hash</p>
+                <button onclick="showTool('keccak_512')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Keccak-512 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate Keccak-512 hash from file</p>
+                <button onclick="showTool('keccak_512_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- SHAKE -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHAKE128</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHAKE128 hash</p>
+                <button onclick="showTool('shake128')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHAKE128 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHAKE128 hash from file</p>
+                <button onclick="showTool('shake128_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHAKE256</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHAKE256 hash</p>
+                <button onclick="showTool('shake256')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="hash">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">SHAKE256 File</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate SHAKE256 hash from file</p>
+                <button onclick="showTool('shake256_file')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Encoding Tools -->
+            
+            <!-- Cryptography Tools -->
+            <!-- AES -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">AES Encryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encrypt text using AES</p>
+                <button onclick="showTool('aes_encrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">AES Decryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decrypt AES encrypted text</p>
+                <button onclick="showTool('aes_decrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- DES -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">DES Encryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encrypt text using DES</p>
+                <button onclick="showTool('des_encrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">DES Decryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decrypt DES encrypted text</p>
+                <button onclick="showTool('des_decrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Triple DES -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Triple DES Encryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encrypt text using Triple DES</p>
+                <button onclick="showTool('tripledes_encrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Triple DES Decryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decrypt Triple DES encrypted text</p>
+                <button onclick="showTool('tripledes_decrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- RC4 -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RC4 Encryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encrypt text using RC4</p>
+                <button onclick="showTool('rc4_encrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RC4 Decryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decrypt RC4 encrypted text</p>
+                <button onclick="showTool('rc4_decrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- RSA -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RSA Key Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate RSA key pairs</p>
+                <button onclick="showTool('rsa_keygen')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RSA Encryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encrypt text using RSA</p>
+                <button onclick="showTool('rsa_encrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RSA Decryption</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decrypt RSA encrypted text</p>
+                <button onclick="showTool('rsa_decrypt')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RSA Sign Message</h3>
+                <p class="text-gray-600 mb-3 text-sm">Sign message using RSA</p>
+                <button onclick="showTool('rsa_sign')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">RSA Verify Signature</h3>
+                <p class="text-gray-600 mb-3 text-sm">Verify RSA signature</p>
+                <button onclick="showTool('rsa_verify')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- ECDSA -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">ECDSA Key Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate ECDSA key pairs</p>
+                <button onclick="showTool('ecdsa_keygen')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">ECDSA Sign Message</h3>
+                <p class="text-gray-600 mb-3 text-sm">Sign message using ECDSA</p>
+                <button onclick="showTool('ecdsa_sign')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="cryptography">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">ECDSA Verify Signature</h3>
+                <p class="text-gray-600 mb-3 text-sm">Verify ECDSA signature</p>
+                <button onclick="showTool('ecdsa_verify')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Encoding Tools -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Hex Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode text to hexadecimal</p>
+                <button onclick="showTool('hex_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Hex Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode hexadecimal to text</p>
+                <button onclick="showTool('hex_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base32 Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode text to Base32</p>
+                <button onclick="showTool('base32_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base32 Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode Base32 to text</p>
+                <button onclick="showTool('base32_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base58 Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode text to Base58</p>
+                <button onclick="showTool('base58_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base58 Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode Base58 to text</p>
+                <button onclick="showTool('base58_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base64 Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode text to Base64</p>
+                <button onclick="showTool('base64_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Base64 Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode Base64 to text</p>
+                <button onclick="showTool('base64_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">HTML Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode HTML entities</p>
+                <button onclick="showTool('html_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">HTML Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode HTML entities</p>
+                <button onclick="showTool('html_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">URL Encode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Encode URL components</p>
+                <button onclick="showTool('url_encode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="encoding">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">URL Decode</h3>
+                <p class="text-gray-600 mb-3 text-sm">Decode URL components</p>
+                <button onclick="showTool('url_decode')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Format Tools -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">JSON Validator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Validate JSON syntax</p>
+                <button onclick="showTool('json_validator')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">JSON Minifier</h3>
+                <p class="text-gray-600 mb-3 text-sm">Minify JSON</p>
+                <button onclick="showTool('json_minifier')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">JSON Formatter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Format JSON with indentation</p>
+                <button onclick="showTool('json_formatter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">JSON Viewer</h3>
+                <p class="text-gray-600 mb-3 text-sm">View JSON in tree format</p>
+                <button onclick="showTool('json_viewer')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">XML Validator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Validate XML syntax</p>
+                <button onclick="showTool('xml_validator')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">XML Minifier</h3>
+                <p class="text-gray-600 mb-3 text-sm">Minify XML</p>
+                <button onclick="showTool('xml_minifier')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="format">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">XML Formatter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Format XML with indentation</p>
+                <button onclick="showTool('xml_formatter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Convert Tools -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">lowercase</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to lowercase</p>
+                <button onclick="showTool('lower_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">UPPERCASE</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to UPPERCASE</p>
+                <button onclick="showTool('upper_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">camelCase</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to camelCase</p>
+                <button onclick="showTool('camel_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">PascalCase</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to PascalCase</p>
+                <button onclick="showTool('pascal_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">snake_case</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to snake_case</p>
+                <button onclick="showTool('snake_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">kebab-case</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to kebab-case</p>
+                <button onclick="showTool('kebab_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="convert">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">CONSTANT_CASE</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert to CONSTANT_CASE</p>
+                <button onclick="showTool('constant_case')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- Others -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">QR Code Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate QR codes</p>
+                <button onclick="showTool('qr_generator')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+
+
+            <!-- Additional Utility Tools -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Password Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate secure passwords</p>
+                <button onclick="showTool('password_generator')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">UUID Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate UUID/GUID</p>
+                <button onclick="showTool('uuid_generator')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Text Diff Checker</h3>
+                <p class="text-gray-600 mb-3 text-sm">Compare text differences</p>
+                <button onclick="showTool('text_diff')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Lorem Ipsum Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate placeholder text</p>
+                <button onclick="showTool('lorem_ipsum')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Word Counter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Count words, characters, paragraphs</p>
+                <button onclick="showTool('word_counter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Timestamp Converter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Convert timestamps</p>
+                <button onclick="showTool('timestamp_converter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Random Number Generator</h3>
+                <p class="text-gray-600 mb-3 text-sm">Generate random numbers</p>
+                <button onclick="showTool('random_number')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <!-- New Text-Related Tools -->
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Text Replacer</h3>
+                <p class="text-gray-600 mb-3 text-sm">Find and replace text with regex support</p>
+                <button onclick="showTool('text_replacer')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Text Sorter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Sort lines alphabetically or numerically</p>
+                <button onclick="showTool('text_sorter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Duplicate Line Remover</h3>
+                <p class="text-gray-600 mb-3 text-sm">Remove duplicate lines from text</p>
+                <button onclick="showTool('duplicate_remover')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Line Numbers</h3>
+                <p class="text-gray-600 mb-3 text-sm">Add or remove line numbers</p>
+                <button onclick="showTool('line_numbers')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Text Reverser</h3>
+                <p class="text-gray-600 mb-3 text-sm">Reverse text, words, or lines</p>
+                <button onclick="showTool('text_reverser')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+
+            <div class="tool-card bg-white rounded-lg shadow-md p-4 border border-gray-200" data-category="others">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Text Formatter</h3>
+                <p class="text-gray-600 mb-3 text-sm">Format text with various options</p>
+                <button onclick="showTool('text_formatter')" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm">Use Tool</button>
+            </div>
+        </div>
+
+        <!-- Tool Interface -->
+        <div id="tool-interface" class="hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="tool-title" class="text-2xl font-bold text-gray-800"></h2>
+                    <button onclick="hideTool()" class="text-gray-500 hover:text-gray-700 text-2xl flex items-center gap-2" title="Back to tools (Esc)">
+                        &times; <kbd class="bg-gray-100 px-1 rounded text-xs text-gray-600">Esc</kbd>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <label for="input-text" class="block text-sm font-medium text-gray-700 mb-2">Input</label>
+                        <textarea id="input-text" rows="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your text here..."></textarea>
+                        
+                        <!-- File input for file-based tools -->
+                        <div id="file-input-section" class="mt-4 hidden">
+                            <label for="file-input" class="file-label block text-center border-2 border-dashed border-blue-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
+                                <svg class="mx-auto h-8 w-8 text-blue-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                                <span class="text-sm">Choose File or Drag & Drop</span>
+                            </label>
+                            <input type="file" id="file-input" class="file-input" onchange="handleFileInput(event)">
+                            <div id="file-name" class="mt-2 text-sm text-gray-600"></div>
+                        </div>
+                        
+                        <div id="tool-options" class="mt-4"></div>
+                        <div class="mt-4 flex gap-2">
+                            <button id="process-btn" onclick="processInput()" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                                Process <kbd class="bg-blue-600 px-1 rounded text-xs opacity-75">Ctrl+↵</kbd>
+                            </button>
+                            <button onclick="addExampleText()" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                                Example <kbd class="bg-gray-600 px-1 rounded text-xs opacity-75">Ctrl+E</kbd>
+                            </button>
+                            <button onclick="clearInputOutput()" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors">
+                                Clear <kbd class="bg-red-600 px-1 rounded text-xs opacity-75">Ctrl+R</kbd>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="output-text" class="block text-sm font-medium text-gray-700 mb-2">Output</label>
+                        <div id="output-container">
+                            <textarea id="output-text" rows="10" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50" readonly></textarea>
+                            <div id="qr-output" class="hidden mt-4 text-center"></div>
+                            <div id="json-tree" class="hidden mt-4 p-3 border border-gray-300 rounded-lg bg-gray-50 max-h-96 overflow-auto"></div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="copyOutput()" class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                                Copy Output <kbd class="bg-green-600 px-1 rounded text-xs opacity-75">Ctrl+C</kbd>
+                            </button>
+                            <button onclick="downloadOutput()" class="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors">
+                                Download <kbd class="bg-purple-600 px-1 rounded text-xs opacity-75">Ctrl+D</kbd>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 px-4 mt-16">
+        <div class="max-w-6xl mx-auto text-center">
+            <p>&copy; 2024 Online Tools. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentTool = '';
+        let currentFileContent = null;
+
+        // Tool titles mapping
+        const toolTitles = {
+            // Hash tools
+            'crc': 'CRC Checksum Generator',
+            'md2': 'MD2 Hash Generator',
+            'md2_file': 'MD2 File Hash Generator',
+            'md4': 'MD4 Hash Generator', 
+            'md4_file': 'MD4 File Hash Generator',
+            'md5': 'MD5 Hash Generator',
+            'md5_file': 'MD5 File Hash Generator',
+            'sha1': 'SHA1 Hash Generator',
+            'sha1_file': 'SHA1 File Hash Generator',
+            'sha224': 'SHA224 Hash Generator',
+            'sha224_file': 'SHA224 File Hash Generator',
+            'sha256': 'SHA256 Hash Generator',
+            'sha256_file': 'SHA256 File Hash Generator',
+            'double_sha256': 'Double SHA256 Hash Generator',
+            'sha384': 'SHA384 Hash Generator',
+            'sha384_file': 'SHA384 File Hash Generator',
+            'sha512': 'SHA512 Hash Generator',
+            'sha512_file': 'SHA512 File Hash Generator',
+            'sha512_224': 'SHA512/224 Hash Generator',
+            'sha512_224_file': 'SHA512/224 File Hash Generator',
+            'sha512_256': 'SHA512/256 Hash Generator',
+            'sha512_256_file': 'SHA512/256 File Hash Generator',
+            'sha3_224': 'SHA3-224 Hash Generator',
+            'sha3_224_file': 'SHA3-224 File Hash Generator',
+            'sha3_256': 'SHA3-256 Hash Generator',
+            'sha3_256_file': 'SHA3-256 File Hash Generator',
+            'sha3_384': 'SHA3-384 Hash Generator',
+            'sha3_384_file': 'SHA3-384 File Hash Generator',
+            'sha3_512': 'SHA3-512 Hash Generator',
+            'sha3_512_file': 'SHA3-512 File Hash Generator',
+            'keccak_224': 'Keccak-224 Hash Generator',
+            'keccak_224_file': 'Keccak-224 File Hash Generator',
+            'keccak_256': 'Keccak-256 Hash Generator',
+            'keccak_256_file': 'Keccak-256 File Hash Generator',
+            'keccak_384': 'Keccak-384 Hash Generator',
+            'keccak_384_file': 'Keccak-384 File Hash Generator',
+            'keccak_512': 'Keccak-512 Hash Generator',
+            'keccak_512_file': 'Keccak-512 File Hash Generator',
+            'shake128': 'SHAKE128 Hash Generator',
+            'shake128_file': 'SHAKE128 File Hash Generator',
+            'shake256': 'SHAKE256 Hash Generator',
+            'shake256_file': 'SHAKE256 File Hash Generator',
+            // Encoding tools
+            'hex_encode': 'Hex Encoder',
+            'hex_decode': 'Hex Decoder',
+            'base32_encode': 'Base32 Encoder',
+            'base32_decode': 'Base32 Decoder',
+            'base58_encode': 'Base58 Encoder',
+            'base58_decode': 'Base58 Decoder',
+            'base64_encode': 'Base64 Encoder',
+            'base64_decode': 'Base64 Decoder',
+            'html_encode': 'HTML Encoder',
+            'html_decode': 'HTML Decoder',
+            'url_encode': 'URL Encoder',
+            'url_decode': 'URL Decoder',
+            // Format tools
+            'json_validator': 'JSON Validator',
+            'json_minifier': 'JSON Minifier',
+            'json_formatter': 'JSON Formatter',
+            'json_viewer': 'JSON Viewer',
+            'xml_validator': 'XML Validator',
+            'xml_minifier': 'XML Minifier',
+            'xml_formatter': 'XML Formatter',
+            // Convert tools
+            'lower_case': 'Lowercase Converter',
+            'upper_case': 'Uppercase Converter',
+            'camel_case': 'camelCase Converter',
+            'pascal_case': 'PascalCase Converter',
+            'snake_case': 'snake_case Converter',
+            'kebab_case': 'kebab-case Converter',
+            'constant_case': 'CONSTANT_CASE Converter',
+            // Cryptography tools
+            'aes_encrypt': 'AES Encryption',
+            'aes_decrypt': 'AES Decryption',
+            'des_encrypt': 'DES Encryption',
+            'des_decrypt': 'DES Decryption',
+            'tripledes_encrypt': 'Triple DES Encryption',
+            'tripledes_decrypt': 'Triple DES Decryption',
+            'rc4_encrypt': 'RC4 Encryption',
+            'rc4_decrypt': 'RC4 Decryption',
+            'rsa_keygen': 'RSA Key Generator',
+            'rsa_encrypt': 'RSA Encryption',
+            'rsa_decrypt': 'RSA Decryption',
+            'rsa_sign': 'RSA Sign Message',
+            'rsa_verify': 'RSA Verify Signature',
+            'ecdsa_keygen': 'ECDSA Key Generator',
+            'ecdsa_sign': 'ECDSA Sign Message',
+            'ecdsa_verify': 'ECDSA Verify Signature',
+            // Others
+            'qr_generator': 'QR Code Generator',
+            'password_generator': 'Password Generator',
+            'uuid_generator': 'UUID Generator',
+            'text_diff': 'Text Diff Checker',
+            'lorem_ipsum': 'Lorem Ipsum Generator',
+            'word_counter': 'Word Counter',
+            'timestamp_converter': 'Timestamp Converter',
+            'random_number': 'Random Number Generator',
+            // Text Tools
+            'text_replacer': 'Text Replacer',
+            'text_sorter': 'Text Sorter',
+            'duplicate_remover': 'Duplicate Line Remover',
+            'line_numbers': 'Line Numbers',
+            'text_reverser': 'Text Reverser',
+            'text_formatter': 'Text Formatter'
+        };
+
+        // Category filtering
+        function showCategory(category) {
+            const tools = document.querySelectorAll('.tool-card');
+            const buttons = document.querySelectorAll('.category-btn');
+            
+            // Update button styles
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-blue-500', 'text-white');
+            
+            // Show/hide tools
+            tools.forEach(tool => {
+                if (category === 'all' || tool.dataset.category === category) {
+                    tool.style.display = 'block';
+                } else {
+                    tool.style.display = 'none';
+                }
+            });
+        }
+
+        // Show tool interface (enhanced with real-time processing)
+        function showTool(tool) {
+            currentTool = tool;
+            document.getElementById('tools-grid').style.display = 'none';
+            document.getElementById('tool-interface').classList.remove('hidden');
+            
+            document.getElementById('tool-title').textContent = toolTitles[tool] || tool;
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            document.getElementById('qr-output').classList.add('hidden');
+            document.getElementById('json-tree').classList.add('hidden');
+            document.getElementById('output-text').classList.remove('hidden');
+            
+            // Reset file input
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            fileInput.value = '';
+            fileName.textContent = '';
+            fileName.style.color = '#6b7280';
+            currentFileContent = null;
+            
+            // Show/hide file input for file-based tools
+            const fileInputSection = document.getElementById('file-input-section');
+            if (tool.includes('_file')) {
+                fileInputSection.classList.remove('hidden');
+            } else {
+                fileInputSection.classList.add('hidden');
+            }
+            
+            // Setup tool-specific options
+            setupToolOptions(tool);
+            
+            // Setup real-time processing for appropriate tools
+            setupRealTimeProcessing();
+        }
+
+        // Hide tool interface
+        function hideTool() {
+            document.getElementById('tools-grid').style.display = 'grid';
+            document.getElementById('tool-interface').classList.add('hidden');
+            currentTool = '';
+            currentFileContent = null;
+        }
+
+        // Setup tool-specific options
+        function setupToolOptions(tool) {
+            const optionsDiv = document.getElementById('tool-options');
+            optionsDiv.innerHTML = '';
+            
+            if (tool === 'shake128' || tool === 'shake256' || tool.includes('shake')) {
+                optionsDiv.innerHTML = `
+                    <div class="mb-4">
+                        <label for="output-length" class="block text-sm font-medium text-gray-700 mb-2">Output Length (bits)</label>
+                        <input type="number" id="output-length" value="256" min="1" max="2048" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                `;
+            } else if (tool === 'qr_generator') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="mb-4">
+                            <label for="qr-size" class="block text-sm font-medium text-gray-700 mb-2">Size (pixels)</label>
+                            <select id="qr-size" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="128">128x128</option>
+                                <option value="256" selected>256x256</option>
+                                <option value="512">512x512</option>
+                                <option value="1024">1024x1024</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="qr-error-level" class="block text-sm font-medium text-gray-700 mb-2">Error Correction</label>
+                            <select id="qr-error-level" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="L">Low (~7%)</option>
+                                <option value="M" selected>Medium (~15%)</option>
+                                <option value="Q">Quartile (~25%)</option>
+                                <option value="H">High (~30%)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="qr-margin" class="block text-sm font-medium text-gray-700 mb-2">Margin</label>
+                            <input type="range" id="qr-margin" min="0" max="10" value="4" class="w-full">
+                            <div class="text-xs text-gray-500 text-center">0 - 10</div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="qr-color-dark" class="block text-sm font-medium text-gray-700 mb-2">Foreground Color</label>
+                            <input type="color" id="qr-color-dark" value="#000000" class="w-full h-10 border border-gray-300 rounded-lg">
+                        </div>
+                        <div class="mb-4">
+                            <label for="qr-color-light" class="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
+                            <input type="color" id="qr-color-light" value="#FFFFFF" class="w-full h-10 border border-gray-300 rounded-lg">
+                        </div>
+                    </div>
+                `;
+            } else if (tool.includes('aes_') || tool.includes('des_') || tool.includes('tripledes_') || tool.includes('rc4_')) {
+                optionsDiv.innerHTML = `
+                    <div class="mb-4">
+                        <label for="crypto-key" class="block text-sm font-medium text-gray-700 mb-2">Encryption Key</label>
+                        <input type="text" id="crypto-key" placeholder="Enter encryption key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                `;
+            } else if (tool.includes('rsa_')) {
+                if (tool === 'rsa_keygen') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="rsa-key-size" class="block text-sm font-medium text-gray-700 mb-2">Key Size (bits)</label>
+                            <select id="rsa-key-size" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="1024">1024</option>
+                                <option value="2048" selected>2048</option>
+                                <option value="4096">4096</option>
+                            </select>
+                        </div>
+                    `;
+                } else if (tool === 'rsa_encrypt' || tool === 'rsa_decrypt') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="rsa-key" class="block text-sm font-medium text-gray-700 mb-2">${tool === 'rsa_encrypt' ? 'Public Key' : 'Private Key'}</label>
+                            <textarea id="rsa-key" rows="4" placeholder="Enter ${tool === 'rsa_encrypt' ? 'public' : 'private'} key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    `;
+                } else if (tool === 'rsa_sign') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="rsa-private-key" class="block text-sm font-medium text-gray-700 mb-2">Private Key</label>
+                            <textarea id="rsa-private-key" rows="4" placeholder="Enter private key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    `;
+                } else if (tool === 'rsa_verify') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="rsa-public-key" class="block text-sm font-medium text-gray-700 mb-2">Public Key</label>
+                            <textarea id="rsa-public-key" rows="3" placeholder="Enter public key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="rsa-signature" class="block text-sm font-medium text-gray-700 mb-2">Signature</label>
+                            <textarea id="rsa-signature" rows="3" placeholder="Enter signature to verify" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    `;
+                }
+            } else if (tool.includes('ecdsa_')) {
+                if (tool === 'ecdsa_keygen') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="ecdsa-curve" class="block text-sm font-medium text-gray-700 mb-2">Curve</label>
+                            <select id="ecdsa-curve" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="P-256" selected>P-256</option>
+                                <option value="P-384">P-384</option>
+                                <option value="P-521">P-521</option>
+                            </select>
+                        </div>
+                    `;
+                } else if (tool === 'ecdsa_sign') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="ecdsa-private-key" class="block text-sm font-medium text-gray-700 mb-2">Private Key</label>
+                            <textarea id="ecdsa-private-key" rows="3" placeholder="Enter private key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    `;
+                } else if (tool === 'ecdsa_verify') {
+                    optionsDiv.innerHTML = `
+                        <div class="mb-4">
+                            <label for="ecdsa-public-key" class="block text-sm font-medium text-gray-700 mb-2">Public Key</label>
+                            <textarea id="ecdsa-public-key" rows="3" placeholder="Enter public key" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="ecdsa-signature" class="block text-sm font-medium text-gray-700 mb-2">Signature</label>
+                            <textarea id="ecdsa-signature" rows="3" placeholder="Enter signature to verify" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    `;
+                }
+            } else if (tool === 'password_generator') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="password-length" class="block text-sm font-medium text-gray-700 mb-2">Password Length</label>
+                            <input type="range" id="password-length" min="4" max="128" value="16" class="w-full">
+                            <div class="text-xs text-gray-500 text-center">4 - 128 characters</div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Character Types</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="include-uppercase" checked class="mr-2">
+                                    <span class="text-sm">Uppercase (A-Z)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="include-lowercase" checked class="mr-2">
+                                    <span class="text-sm">Lowercase (a-z)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="include-numbers" checked class="mr-2">
+                                    <span class="text-sm">Numbers (0-9)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="include-symbols" class="mr-2">
+                                    <span class="text-sm">Symbols (!@#$...)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="exclude-ambiguous" class="mr-2">
+                                    <span class="text-sm">Exclude ambiguous (0O1Il)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'uuid_generator') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="uuid-version" class="block text-sm font-medium text-gray-700 mb-2">UUID Version</label>
+                            <select id="uuid-version" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="v4" selected>Version 4 (Random)</option>
+                                <option value="v1">Version 1 (Timestamp)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="uuid-count" class="block text-sm font-medium text-gray-700 mb-2">Number of UUIDs</label>
+                            <input type="number" id="uuid-count" value="1" min="1" max="100" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'lorem_ipsum') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="mb-4">
+                            <label for="lorem-type" class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                            <select id="lorem-type" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="paragraphs">Paragraphs</option>
+                                <option value="sentences">Sentences</option>
+                                <option value="words">Words</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="lorem-count" class="block text-sm font-medium text-gray-700 mb-2">Count</label>
+                            <input type="number" id="lorem-count" value="3" min="1" max="100" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="start-with-lorem" checked class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Start with "Lorem ipsum"</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'random_number') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="random-min" class="block text-sm font-medium text-gray-700 mb-2">Minimum Value</label>
+                            <input type="number" id="random-min" value="1" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label for="random-max" class="block text-sm font-medium text-gray-700 mb-2">Maximum Value</label>
+                            <input type="number" id="random-max" value="100" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label for="random-count" class="block text-sm font-medium text-gray-700 mb-2">Count</label>
+                            <input type="number" id="random-count" value="1" min="1" max="1000" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label for="number-format" class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                            <select id="number-format" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="integer">Integer</option>
+                                <option value="decimal">Decimal</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="decimal-places" class="block text-sm font-medium text-gray-700 mb-2">Decimal Places</label>
+                            <input type="number" id="decimal-places" value="2" min="1" max="10" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="allow-duplicates" checked class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Allow Duplicates</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'text_replacer') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="find-text" class="block text-sm font-medium text-gray-700 mb-2">Find Text</label>
+                            <input type="text" id="find-text" placeholder="Text to find" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label for="replace-text" class="block text-sm font-medium text-gray-700 mb-2">Replace With</label>
+                            <input type="text" id="replace-text" placeholder="Replacement text" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="use-regex" class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Use Regular Expression</span>
+                            </label>
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="case-sensitive" class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Case Sensitive</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'text_sorter') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="mb-4">
+                            <label for="sort-type" class="block text-sm font-medium text-gray-700 mb-2">Sort Type</label>
+                            <select id="sort-type" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="alphabetical">Alphabetical</option>
+                                <option value="numerical">Numerical</option>
+                                <option value="length">By Length</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="sort-order" class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+                            <select id="sort-order" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="ascending">Ascending</option>
+                                <option value="descending">Descending</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="case-insensitive" checked class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Case Insensitive</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'duplicate_remover') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="case-insensitive-dup" checked class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Case Insensitive</span>
+                            </label>
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="trim-whitespace" checked class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Trim Whitespace</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'line_numbers') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="mb-4">
+                            <label for="number-action" class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                            <select id="number-action" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="add">Add Numbers</option>
+                                <option value="remove">Remove Numbers</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="start-number" class="block text-sm font-medium text-gray-700 mb-2">Start Number</label>
+                            <input type="number" id="start-number" value="1" min="0" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="mb-4">
+                            <label for="number-format-style" class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                            <select id="number-format-style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="number">1. </option>
+                                <option value="padded">01. </option>
+                                <option value="parentheses">(1) </option>
+                                <option value="brackets">[1] </option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'text_reverser') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="reverse-type" class="block text-sm font-medium text-gray-700 mb-2">Reverse Type</label>
+                            <select id="reverse-type" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="characters">Characters</option>
+                                <option value="words">Words</option>
+                                <option value="lines">Lines</option>
+                                <option value="word-order">Word Order</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="preserve-punctuation" class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">Preserve Punctuation</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (tool === 'text_formatter') {
+                optionsDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label for="format-action" class="block text-sm font-medium text-gray-700 mb-2">Format Action</label>
+                            <select id="format-action" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="trim">Trim Whitespace</option>
+                                <option value="title">Title Case</option>
+                                <option value="sentence">Sentence Case</option>
+                                <option value="extract-emails">Extract Emails</option>
+                                <option value="extract-urls">Extract URLs</option>
+                                <option value="remove-extra-spaces">Remove Extra Spaces</option>
+                                <option value="wrap-text">Wrap Text</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="wrap-width" class="block text-sm font-medium text-gray-700 mb-2">Wrap Width (characters)</label>
+                            <input type="number" id="wrap-width" value="80" min="10" max="200" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Real-time processing for simple tools
+        function setupRealTimeProcessing() {
+            const inputText = document.getElementById('input-text');
+            let debounceTimer;
+            
+            inputText.addEventListener('input', function() {
+                if (!currentTool || currentTool.includes('_file') || 
+                    currentTool.includes('rsa_') || currentTool.includes('ecdsa_') ||
+                    currentTool.includes('cryptography') || currentTool === '') {
+                    return; // Skip real-time for complex operations
+                }
+                
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    if (inputText.value.trim() !== '') {
+                        processInput();
+                    }
+                }, 500); // 500ms delay
+            });
+        }
+
+        // Handle file input
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            const fileNameElement = document.getElementById('file-name');
+            const maxFileSize = 50 * 1024 * 1024; // 50MB limit
+            
+            if (file.size > maxFileSize) {
+                fileNameElement.textContent = 'File too large (max 50MB)';
+                fileNameElement.style.color = '#ef4444';
+                return;
+            }
+            
+            fileNameElement.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            fileNameElement.style.color = '#10b981';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentFileContent = e.target.result;
+            };
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentLoaded = Math.round((e.loaded / e.total) * 100);
+                    fileNameElement.textContent = `Loading... ${percentLoaded}%`;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Add drag and drop functionality
+        function setupDragAndDrop() {
+            const fileSection = document.getElementById('file-input-section');
+            const fileLabel = fileSection.querySelector('.file-label');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileSection.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileSection.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileSection.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight(e) {
+                fileLabel.style.background = '#1d4ed8';
+                fileLabel.style.transform = 'scale(1.02)';
+            }
+            
+            function unhighlight(e) {
+                fileLabel.style.background = '#3b82f6';
+                fileLabel.style.transform = 'scale(1)';
+            }
+            
+            fileSection.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    processFile(files[0]);
+                }
+            }
+        }
+
+        // Initialize drag and drop and keyboard shortcuts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+            setupKeyboardShortcuts();
+            
+            // Initialize Highlight.js
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightAll();
+                console.log('Highlight.js initialized successfully');
+            } else {
+                console.error('Highlight.js not loaded');
+            }
+        });
+
+        // Keyboard shortcuts functionality
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Don't trigger shortcuts when typing in input fields
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                    // Allow Ctrl+A in text areas for select all
+                    if (e.ctrlKey && e.key === 'a' && e.target.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    // Only process shortcuts with Ctrl key in input fields
+                    if (!e.ctrlKey) return;
+                }
+
+                // Ctrl + Enter: Process input
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        processInput();
+                        showShortcutFeedback('⚡ Processed');
+                    }
+                }
+                
+                // Ctrl + C: Copy output (when not in input field)
+                else if (e.ctrlKey && e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        copyOutput();
+                        showShortcutFeedback('📋 Copied');
+                    }
+                }
+                
+                // Ctrl + D: Download output
+                else if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        downloadOutput();
+                        showShortcutFeedback('💾 Downloaded');
+                    }
+                }
+                
+                // Ctrl + R: Clear input/output
+                else if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        clearInputOutput();
+                        showShortcutFeedback('🗑️ Cleared');
+                    }
+                }
+                
+                // Ctrl + E: Add example text
+                else if (e.ctrlKey && e.key === 'e') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        addExampleText();
+                        showShortcutFeedback('📝 Example Added');
+                    }
+                }
+                
+                // Ctrl + F: Focus search
+                else if (e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                        showShortcutFeedback('🔍 Search Focused');
+                    }
+                }
+                
+                // Escape: Go back to tools grid
+                else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (currentTool && !document.getElementById('tool-interface').classList.contains('hidden')) {
+                        hideTool();
+                        showShortcutFeedback('⬅️ Back to Tools');
+                    }
+                }
+                
+                // Ctrl + 1-9: Quick category selection
+                else if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+                    e.preventDefault();
+                    const categories = ['all', 'hash', 'encoding', 'format', 'convert', 'crypto', 'other'];
+                    const categoryIndex = parseInt(e.key) - 1;
+                    if (categoryIndex < categories.length) {
+                        const categoryButtons = document.querySelectorAll('.category-btn');
+                        if (categoryButtons[categoryIndex]) {
+                            categoryButtons[categoryIndex].click();
+                            showShortcutFeedback(`📂 ${categories[categoryIndex].toUpperCase()}`);
+                        }
+                    }
+                }
+                
+                // Ctrl + Shift + H: Show shortcuts help
+                else if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+                    e.preventDefault();
+                    showShortcutsHelp();
+                }
+            });
+        }
+
+        // Show shortcut feedback
+        function showShortcutFeedback(message) {
+            // Remove existing feedback
+            const existingFeedback = document.querySelector('.shortcut-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            // Create feedback element
+            const feedback = document.createElement('div');
+            feedback.className = 'shortcut-feedback fixed top-4 right-4 bg-gray-800 text-white px-3 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+            feedback.style.transform = 'translateY(-10px)';
+            feedback.style.opacity = '0';
+            feedback.textContent = message;
+
+            document.body.appendChild(feedback);
+
+            // Animate in
+            setTimeout(() => {
+                feedback.style.transform = 'translateY(0)';
+                feedback.style.opacity = '1';
+            }, 10);
+
+            // Remove after delay
+            setTimeout(() => {
+                feedback.style.transform = 'translateY(-10px)';
+                feedback.style.opacity = '0';
+                setTimeout(() => feedback.remove(), 300);
+            }, 2000);
+        }
+
+        // Show shortcuts help modal
+        function showShortcutsHelp() {
+            // Remove existing modal
+            const existingModal = document.querySelector('.shortcuts-modal');
+            if (existingModal) {
+                existingModal.remove();
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'shortcuts-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl max-h-80vh overflow-y-auto m-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">⌨️ Keyboard Shortcuts</h2>
+                        <button onclick="this.closest('.shortcuts-modal').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-2">🔧 Tool Actions</h3>
+                            <div class="space-y-1">
+                                <div class="flex justify-between"><span>Process Input</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + Enter</kbd></div>
+                                <div class="flex justify-between"><span>Copy Output</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + C</kbd></div>
+                                <div class="flex justify-between"><span>Download Output</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + D</kbd></div>
+                                <div class="flex justify-between"><span>Clear All</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + R</kbd></div>
+                                <div class="flex justify-between"><span>Add Example</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + E</kbd></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-2">🧭 Navigation</h3>
+                            <div class="space-y-1">
+                                <div class="flex justify-between"><span>Back to Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Escape</kbd></div>
+                                <div class="flex justify-between"><span>Focus Search</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + F</kbd></div>
+                                <div class="flex justify-between"><span>Show All</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 1</kbd></div>
+                                <div class="flex justify-between"><span>Hash Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 2</kbd></div>
+                                <div class="flex justify-between"><span>Encoding</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 3</kbd></div>
+                                <div class="flex justify-between"><span>Format Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 4</kbd></div>
+                                <div class="flex justify-between"><span>Convert Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 5</kbd></div>
+                                <div class="flex justify-between"><span>Crypto Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 6</kbd></div>
+                                <div class="flex justify-between"><span>Other Tools</span><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl + 7</kbd></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-blue-700"><strong>💡 Tip:</strong> Press <kbd class="bg-blue-100 px-1 rounded">Ctrl + Shift + H</kbd> anytime to toggle this help menu.</p>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Close on background click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function escapeHandler(e) {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            });
+        }
+
+        // Process input based on current tool
+        function processInput() {
+            const input = document.getElementById('input-text').value;
+            const output = document.getElementById('output-text');
+            
+            // For file-based tools, use file content if available
+            let processContent = input;
+            if (currentTool.includes('_file') && currentFileContent) {
+                processContent = new Uint8Array(currentFileContent);
+            } else if (currentTool.includes('_file') && !currentFileContent) {
+                output.value = 'Please select a file to process.';
+                return;
+            } else if (!input.trim() && !currentTool.includes('_file')) {
+                output.value = 'Please enter some text to process.';
+                return;
+            }
+            
+            try {
+                let result = '';
+                
+                // Show processing indicator for heavy operations
+                if (currentTool.includes('rsa_') || currentTool.includes('ecdsa_') || currentTool.includes('_file')) {
+                    output.value = 'Processing...';
+                }
+                
+                switch (currentTool) {
+                    // Hash functions
+                    case 'crc':
+                        result = calculateCRC32(input);
+                        break;
+                    case 'md2':
+                        result = 'MD2 hash generation not available in browser environment';
+                        break;
+                    case 'md4':
+                        result = md4(input);
+                        break;
+                    case 'md5':
+                        result = CryptoJS.MD5(input).toString();
+                        break;
+                    case 'sha1':
+                        result = CryptoJS.SHA1(input).toString();
+                        break;
+                    case 'sha224':
+                        result = CryptoJS.SHA224(input).toString();
+                        break;
+                    case 'sha256':
+                        result = CryptoJS.SHA256(input).toString();
+                        break;
+                    case 'double_sha256':
+                        result = CryptoJS.SHA256(CryptoJS.SHA256(input)).toString();
+                        break;
+                    case 'sha384':
+                        result = CryptoJS.SHA384(input).toString();
+                        break;
+                    case 'sha512':
+                        result = CryptoJS.SHA512(input).toString();
+                        break;
+                    case 'sha3_224':
+                        result = sha3_224(input);
+                        break;
+                    case 'sha3_256':
+                        result = sha3_256(input);
+                        break;
+                    case 'sha3_384':
+                        result = sha3_384(input);
+                        break;
+                    case 'sha3_512':
+                        result = sha3_512(input);
+                        break;
+                    case 'keccak_224':
+                        result = keccak224(input);
+                        break;
+                    case 'keccak_256':
+                        result = keccak256(input);
+                        break;
+                    case 'keccak_384':
+                        result = keccak384(input);
+                        break;
+                    case 'keccak_512':
+                        result = keccak512(input);
+                        break;
+                    case 'shake128':
+                        const length128 = document.getElementById('output-length')?.value || 256;
+                        result = shake128(input, parseInt(length128) / 8);
+                        break;
+                    case 'shake256':
+                        const length256 = document.getElementById('output-length')?.value || 256;
+                        result = shake256(input, parseInt(length256) / 8);
+                        break;
+                    
+                    // Hash functions for files
+                    case 'md2_file':
+                    case 'md4_file':
+                        result = 'MD2/MD4 hash generation not available in browser environment';
+                        break;
+                    case 'md5_file':
+                        result = processFileHash(currentFileContent, 'md5');
+                        break;
+                    case 'sha1_file':
+                        result = processFileHash(currentFileContent, 'sha1');
+                        break;
+                    case 'sha224_file':
+                        result = processFileHash(currentFileContent, 'sha224');
+                        break;
+                    case 'sha256_file':
+                        result = processFileHash(currentFileContent, 'sha256');
+                        break;
+                    case 'sha384_file':
+                        result = processFileHash(currentFileContent, 'sha384');
+                        break;
+                    case 'sha512_file':
+                        result = processFileHash(currentFileContent, 'sha512');
+                        break;
+                    case 'sha512_224_file':
+                        result = processFileHash(currentFileContent, 'sha512_224');
+                        break;
+                    case 'sha512_256_file':
+                        result = processFileHash(currentFileContent, 'sha512_256');
+                        break;
+                    case 'sha3_224_file':
+                        result = processFileHash(currentFileContent, 'sha3_224');
+                        break;
+                    case 'sha3_256_file':
+                        result = processFileHash(currentFileContent, 'sha3_256');
+                        break;
+                    case 'sha3_384_file':
+                        result = processFileHash(currentFileContent, 'sha3_384');
+                        break;
+                    case 'sha3_512_file':
+                        result = processFileHash(currentFileContent, 'sha3_512');
+                        break;
+                    case 'keccak_224_file':
+                        result = processFileHash(currentFileContent, 'keccak_224');
+                        break;
+                    case 'keccak_256_file':
+                        result = processFileHash(currentFileContent, 'keccak_256');
+                        break;
+                    case 'keccak_384_file':
+                        result = processFileHash(currentFileContent, 'keccak_384');
+                        break;
+                    case 'keccak_512_file':
+                        result = processFileHash(currentFileContent, 'keccak_512');
+                        break;
+                    case 'shake128_file':
+                        result = processFileHash(currentFileContent, 'shake128');
+                        break;
+                    case 'shake256_file':
+                        result = processFileHash(currentFileContent, 'shake256');
+                        break;
+                    case 'sha512_224':
+                        result = CryptoJS.SHA512(input).toString().substring(0, 56); // First 224 bits (56 hex chars)
+                        break;
+                    case 'sha512_256':
+                        result = CryptoJS.SHA512(input).toString().substring(0, 64); // First 256 bits (64 hex chars)
+                        break;
+                    
+                    // Cryptography functions
+                    case 'aes_encrypt':
+                        const aesKey = document.getElementById('crypto-key')?.value;
+                        if (!aesKey) throw new Error('Please enter an encryption key');
+                        result = CryptoJS.AES.encrypt(input, aesKey).toString();
+                        break;
+                    case 'aes_decrypt':
+                        const aesDecKey = document.getElementById('crypto-key')?.value;
+                        if (!aesDecKey) throw new Error('Please enter a decryption key');
+                        const aesDecrypted = CryptoJS.AES.decrypt(input, aesDecKey);
+                        result = aesDecrypted.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Decryption failed - check key and input');
+                        break;
+                    case 'des_encrypt':
+                        const desKey = document.getElementById('crypto-key')?.value;
+                        if (!desKey) throw new Error('Please enter an encryption key');
+                        result = CryptoJS.DES.encrypt(input, desKey).toString();
+                        break;
+                    case 'des_decrypt':
+                        const desDecKey = document.getElementById('crypto-key')?.value;
+                        if (!desDecKey) throw new Error('Please enter a decryption key');
+                        const desDecrypted = CryptoJS.DES.decrypt(input, desDecKey);
+                        result = desDecrypted.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Decryption failed - check key and input');
+                        break;
+                    case 'tripledes_encrypt':
+                        const tripleDesKey = document.getElementById('crypto-key')?.value;
+                        if (!tripleDesKey) throw new Error('Please enter an encryption key');
+                        result = CryptoJS.TripleDES.encrypt(input, tripleDesKey).toString();
+                        break;
+                    case 'tripledes_decrypt':
+                        const tripleDesDecKey = document.getElementById('crypto-key')?.value;
+                        if (!tripleDesDecKey) throw new Error('Please enter a decryption key');
+                        const tripleDesDecrypted = CryptoJS.TripleDES.decrypt(input, tripleDesDecKey);
+                        result = tripleDesDecrypted.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Decryption failed - check key and input');
+                        break;
+                    case 'rc4_encrypt':
+                        const rc4Key = document.getElementById('crypto-key')?.value;
+                        if (!rc4Key) throw new Error('Please enter an encryption key');
+                        result = CryptoJS.RC4.encrypt(input, rc4Key).toString();
+                        break;
+                    case 'rc4_decrypt':
+                        const rc4DecKey = document.getElementById('crypto-key')?.value;
+                        if (!rc4DecKey) throw new Error('Please enter a decryption key');
+                        const rc4Decrypted = CryptoJS.RC4.decrypt(input, rc4DecKey);
+                        result = rc4Decrypted.toString(CryptoJS.enc.Utf8);
+                        if (!result) throw new Error('Decryption failed - check key and input');
+                        break;
+                    case 'rsa_keygen':
+                        generateRSAKeys();
+                        return;
+                    case 'rsa_encrypt':
+                        result = encryptRSA(input);
+                        break;
+                    case 'rsa_decrypt':
+                        result = decryptRSA(input);
+                        break;
+                    case 'rsa_sign':
+                        result = signRSA(input);
+                        break;
+                    case 'rsa_verify':
+                        result = verifyRSA(input);
+                        break;
+                    case 'ecdsa_keygen':
+                        generateECDSAKeys();
+                        return;
+                    case 'ecdsa_sign':
+                        result = signECDSA(input);
+                        break;
+                    case 'ecdsa_verify':
+                        result = verifyECDSA(input);
+                        break;
+                    
+                    // Encoding functions
+                    case 'hex_encode':
+                        result = stringToHex(input);
+                        break;
+                    case 'hex_decode':
+                        result = hexToString(input);
+                        break;
+                    case 'base32_encode':
+                        result = base32Encode(input);
+                        break;
+                    case 'base32_decode':
+                        result = base32Decode(input);
+                        break;
+                    case 'base58_encode':
+                        result = base58Encode(input);
+                        break;
+                    case 'base58_decode':
+                        result = base58Decode(input);
+                        break;
+                    case 'base64_encode':
+                        result = btoa(unescape(encodeURIComponent(input)));
+                        break;
+                    case 'base64_decode':
+                        result = decodeURIComponent(escape(atob(input)));
+                        break;
+                    case 'html_encode':
+                        result = htmlEncode(input);
+                        break;
+                    case 'html_decode':
+                        result = htmlDecode(input);
+                        break;
+                    case 'url_encode':
+                        result = encodeURIComponent(input);
+                        break;
+                    case 'url_decode':
+                        result = decodeURIComponent(input);
+                        break;
+                    
+                    // Format functions
+                    case 'json_validator':
+                        result = validateJSON(input);
+                        break;
+                    case 'json_minifier':
+                        result = JSON.stringify(JSON.parse(input));
+                        break;
+                    case 'json_formatter':
+                        result = JSON.stringify(JSON.parse(input), null, 2);
+                        break;
+                    case 'json_viewer':
+                        showJSONTree(input);
+                        return;
+                    case 'xml_validator':
+                        result = validateXML(input);
+                        break;
+                    case 'xml_minifier':
+                        result = minifyXML(input);
+                        break;
+                    case 'xml_formatter':
+                        result = formatXML(input);
+                        break;
+                    
+                    // Convert functions
+                    case 'lower_case':
+                        result = input.toLowerCase();
+                        break;
+                    case 'upper_case':
+                        result = input.toUpperCase();
+                        break;
+                    case 'camel_case':
+                        result = toCamelCase(input);
+                        break;
+                    case 'pascal_case':
+                        result = toPascalCase(input);
+                        break;
+                    case 'snake_case':
+                        result = toSnakeCase(input);
+                        break;
+                    case 'kebab_case':
+                        result = toKebabCase(input);
+                        break;
+                    case 'constant_case':
+                        result = toConstantCase(input);
+                        break;
+                    
+                    // Others
+                    case 'qr_generator':
+                        generateQRCode(input);
+                        return;
+                    case 'password_generator':
+                        generatePassword();
+                        return;
+                    case 'uuid_generator':
+                        generateUUID();
+                        return;
+                    case 'text_diff':
+                        showTextDiff();
+                        return;
+                    case 'lorem_ipsum':
+                        generateLoremIpsum();
+                        return;
+                    case 'word_counter':
+                        result = countWords(input);
+                        break;
+                    case 'timestamp_converter':
+                        result = convertTimestamp(input);
+                        break;
+                    case 'random_number':
+                        generateRandomNumber();
+                        return;
+                    case 'text_replacer':
+                        result = replaceText(input);
+                        break;
+                    case 'text_sorter':
+                        result = sortText(input);
+                        break;
+                    case 'duplicate_remover':
+                        result = removeDuplicateLines(input);
+                        break;
+                    case 'line_numbers':
+                        result = processLineNumbers(input);
+                        break;
+                    case 'text_reverser':
+                        result = reverseText(input);
+                        break;
+                    case 'text_formatter':
+                        result = formatText(input);
+                        break;
+                    
+                    default:
+                        result = 'Tool implementation in progress...';
+                }
+                
+                output.value = result;
+            } catch (error) {
+                output.value = 'Error: ' + error.message;
+            }
+        }
+
+        // Copy output to clipboard
+        function copyOutput() {
+            const output = document.getElementById('output-text');
+            
+            // Try modern clipboard API first, fallback to execCommand
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(output.value).then(() => {
+                    showCopyFeedback();
+                }).catch(() => {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+            
+            function fallbackCopy() {
+                output.select();
+                output.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    document.execCommand('copy');
+                    showCopyFeedback();
+                } catch (err) {
+                    console.error('Failed to copy: ', err);
+                }
+            }
+            
+            function showCopyFeedback() {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('bg-green-600');
+                    btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                }, 2000);
+            }
+        }
+
+        // Download output functionality
+        function downloadOutput() {
+            const output = document.getElementById('output-text');
+            const content = output.value;
+            
+            if (!content.trim()) {
+                alert('No output to download');
+                return;
+            }
+            
+            const fileName = `${currentTool || 'output'}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Add clear functionality
+        function clearInputOutput() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            document.getElementById('qr-output').classList.add('hidden');
+            document.getElementById('json-tree').classList.add('hidden');
+            document.getElementById('output-text').classList.remove('hidden');
+            
+            // Clear file input
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            fileInput.value = '';
+            fileName.textContent = '';
+            currentFileContent = null;
+        }
+
+        // Add example text for tools
+        function addExampleText() {
+            const input = document.getElementById('input-text');
+            const examples = {
+                'md5': 'Hello World',
+                'sha256': 'Hello World',
+                'base64_encode': 'Hello World',
+                'base64_decode': 'SGVsbG8gV29ybGQ=',
+                'hex_encode': 'Hello World',
+                'hex_decode': '48656c6c6f20576f726c64',
+                'url_encode': 'Hello World!',
+                'url_decode': 'Hello%20World%21',
+                'json_formatter': '{"name":"John","age":30,"city":"New York"}',
+                'json_validator': '{"name":"John","age":30,"city":"New York"}',
+                'json_minifier': '{\n  "name": "John",\n  "age": 30,\n  "city": "New York"\n}',
+                'xml_formatter': '<root><person><name>John</name><age>30</age></person></root>',
+                'camel_case': 'hello world example',
+                'pascal_case': 'hello world example',
+                'snake_case': 'Hello World Example',
+                'kebab_case': 'Hello World Example',
+                'qr_generator': 'https://github.com',
+                'word_counter': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+                'timestamp_converter': '1640995200',
+                'text_replacer': 'Hello World! Hello Universe!',
+                'text_sorter': 'Zebra\nApple\nBanana\nCat\nDog',
+                'duplicate_remover': 'Apple\nBanana\nApple\nCherry\nBanana\nDate',
+                'line_numbers': 'First line\nSecond line\nThird line',
+                'text_reverser': 'Hello World!',
+                'text_formatter': 'this is a sample text with   extra   spaces and mixed case.'
+            };
+            
+            if (examples[currentTool]) {
+                input.value = examples[currentTool];
+                // Trigger processing for real-time tools
+                if (!currentTool.includes('_file') && !currentTool.includes('rsa_') && !currentTool.includes('ecdsa_')) {
+                    setTimeout(() => processInput(), 100);
+                }
+            }
+        }
+
+        // Missing hash implementations
+        function md4(str) {
+            // MD4 implementation using crypto-js fallback or manual implementation
+            // Since CryptoJS doesn't have MD4, we'll use a simplified version
+            return 'MD4 implementation not available in browser - use server-side implementation';
+        }
+
+        // CRC32 implementation
+        function calculateCRC32(str) {
+            const crcTable = [];
+            for (let n = 0; n < 256; n++) {
+                let c = n;
+                for (let k = 0; k < 8; k++) {
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                }
+                crcTable[n] = c;
+            }
+            
+            let crc = 0 ^ (-1);
+            for (let i = 0; i < str.length; i++) {
+                crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+            }
+            return ((crc ^ (-1)) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        // File hash processing function
+        function processFileHash(fileContent, hashType) {
+            if (!fileContent) return 'No file content available';
+            
+            try {
+                const uint8Array = new Uint8Array(fileContent);
+                const wordArray = CryptoJS.lib.WordArray.create(uint8Array);
+                
+                switch (hashType) {
+                    case 'md5':
+                        return CryptoJS.MD5(wordArray).toString();
+                    case 'sha1':
+                        return CryptoJS.SHA1(wordArray).toString();
+                    case 'sha224':
+                        return CryptoJS.SHA224(wordArray).toString();
+                    case 'sha256':
+                        return CryptoJS.SHA256(wordArray).toString();
+                    case 'sha384':
+                        return CryptoJS.SHA384(wordArray).toString();
+                    case 'sha512':
+                        return CryptoJS.SHA512(wordArray).toString();
+                    case 'sha512_224':
+                        return CryptoJS.SHA512(wordArray).toString().substring(0, 56);
+                    case 'sha512_256':
+                        return CryptoJS.SHA512(wordArray).toString().substring(0, 64);
+                    case 'sha3_224':
+                        return sha3_224(uint8Array);
+                    case 'sha3_256':
+                        return sha3_256(uint8Array);
+                    case 'sha3_384':
+                        return sha3_384(uint8Array);
+                    case 'sha3_512':
+                        return sha3_512(uint8Array);
+                    case 'keccak_224':
+                        return keccak_224(uint8Array);
+                    case 'keccak_256':
+                        return keccak_256(uint8Array);
+                    case 'keccak_384':
+                        return keccak_384(uint8Array);
+                    case 'keccak_512':
+                        return keccak_512(uint8Array);
+                    case 'shake128':
+                        const shake128Length = document.getElementById('shake-length')?.value || 256;
+                        return shake_128(uint8Array, parseInt(shake128Length) / 8);
+                    case 'shake256':
+                        const shake256Length = document.getElementById('shake-length')?.value || 256;
+                        return shake_256(uint8Array, parseInt(shake256Length) / 8);
+                    default:
+                        return 'Unsupported hash type';
+                }
+            } catch (error) {
+                return 'Error processing file: ' + error.message;
+            }
+        }
+
+        // Cryptography helper functions
+        function generateRSAKeys() {
+            const keySize = document.getElementById('rsa-key-size')?.value || 2048;
+            const output = document.getElementById('output-text');
+            
+            try {
+                const crypt = new JSEncrypt({ default_key_size: parseInt(keySize) });
+                const privateKey = crypt.getPrivateKey();
+                const publicKey = crypt.getPublicKey();
+                
+                output.value = `Private Key:\n${privateKey}\n\nPublic Key:\n${publicKey}`;
+            } catch (error) {
+                output.value = 'Error generating RSA keys: ' + error.message;
+            }
+        }
+
+        function encryptRSA(text) {
+            const publicKey = document.getElementById('rsa-key')?.value;
+            if (!publicKey) throw new Error('Please enter a public key');
+            
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publicKey);
+            const encrypted = encrypt.encrypt(text);
+            
+            if (!encrypted) throw new Error('Encryption failed - check public key format');
+            return encrypted;
+        }
+
+        function decryptRSA(text) {
+            const privateKey = document.getElementById('rsa-key')?.value;
+            if (!privateKey) throw new Error('Please enter a private key');
+            
+            const decrypt = new JSEncrypt();
+            decrypt.setPrivateKey(privateKey);
+            const decrypted = decrypt.decrypt(text);
+            
+            if (!decrypted) throw new Error('Decryption failed - check private key and encrypted text');
+            return decrypted;
+        }
+
+        function signRSA(text) {
+            const privateKey = document.getElementById('rsa-private-key')?.value;
+            if (!privateKey) throw new Error('Please enter a private key');
+            
+            const sign = new JSEncrypt();
+            sign.setPrivateKey(privateKey);
+            const signature = sign.sign(text, CryptoJS.SHA256, "sha256");
+            
+            if (!signature) throw new Error('Signing failed - check private key format');
+            return signature;
+        }
+
+        function verifyRSA(text) {
+            const publicKey = document.getElementById('rsa-public-key')?.value;
+            const signature = document.getElementById('rsa-signature')?.value;
+            
+            if (!publicKey) throw new Error('Please enter a public key');
+            if (!signature) throw new Error('Please enter a signature');
+            
+            const verify = new JSEncrypt();
+            verify.setPublicKey(publicKey);
+            const isValid = verify.verify(text, signature, CryptoJS.SHA256);
+            
+            return isValid ? 'Signature is VALID' : 'Signature is INVALID';
+        }
+
+        async function generateECDSAKeys() {
+            const curve = document.getElementById('ecdsa-curve')?.value || 'P-256';
+            const output = document.getElementById('output-text');
+            
+            try {
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: "ECDSA",
+                        namedCurve: curve,
+                    },
+                    true,
+                    ["sign", "verify"]
+                );
+
+                const privateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+                const publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+
+                const privateKeyB64 = btoa(String.fromCharCode(...new Uint8Array(privateKey)));
+                const publicKeyB64 = btoa(String.fromCharCode(...new Uint8Array(publicKey)));
+
+                output.value = `Private Key (Base64):\n${privateKeyB64}\n\nPublic Key (Base64):\n${publicKeyB64}`;
+            } catch (error) {
+                output.value = 'Error generating ECDSA keys: ' + error.message;
+            }
+        }
+
+        async function signECDSA(text) {
+            const privateKeyB64 = document.getElementById('ecdsa-private-key')?.value;
+            if (!privateKeyB64) throw new Error('Please enter a private key');
+            
+            try {
+                const privateKeyBuffer = Uint8Array.from(atob(privateKeyB64), c => c.charCodeAt(0));
+                const privateKey = await window.crypto.subtle.importKey(
+                    "pkcs8",
+                    privateKeyBuffer,
+                    {
+                        name: "ECDSA",
+                        namedCurve: "P-256",
+                    },
+                    false,
+                    ["sign"]
+                );
+
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                const signature = await window.crypto.subtle.sign(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-256" },
+                    },
+                    privateKey,
+                    data
+                );
+
+                return btoa(String.fromCharCode(...new Uint8Array(signature)));
+            } catch (error) {
+                throw new Error('Signing failed: ' + error.message);
+            }
+        }
+
+        async function verifyECDSA(text) {
+            const publicKeyB64 = document.getElementById('ecdsa-public-key')?.value;
+            const signatureB64 = document.getElementById('ecdsa-signature')?.value;
+            
+            if (!publicKeyB64) throw new Error('Please enter a public key');
+            if (!signatureB64) throw new Error('Please enter a signature');
+            
+            try {
+                const publicKeyBuffer = Uint8Array.from(atob(publicKeyB64), c => c.charCodeAt(0));
+                const publicKey = await window.crypto.subtle.importKey(
+                    "spki",
+                    publicKeyBuffer,
+                    {
+                        name: "ECDSA",
+                        namedCurve: "P-256",
+                    },
+                    false,
+                    ["verify"]
+                );
+
+                const signatureBuffer = Uint8Array.from(atob(signatureB64), c => c.charCodeAt(0));
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+
+                const isValid = await window.crypto.subtle.verify(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-256" },
+                    },
+                    publicKey,
+                    signatureBuffer,
+                    data
+                );
+
+                return isValid ? 'Signature is VALID' : 'Signature is INVALID';
+            } catch (error) {
+                throw new Error('Verification failed: ' + error.message);
+            }
+        }
+
+        // Base32 encoding/decoding functions
+        function base32Encode(input) {
+            if (!input) return '';
+            
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            const bytes = new TextEncoder().encode(input);
+            let bits = '';
+            
+            // Convert bytes to binary string
+            for (let i = 0; i < bytes.length; i++) {
+                bits += bytes[i].toString(2).padStart(8, '0');
+            }
+            
+            let result = '';
+            // Process 5 bits at a time
+            for (let i = 0; i < bits.length; i += 5) {
+                const chunk = bits.slice(i, i + 5).padEnd(5, '0');
+                result += alphabet[parseInt(chunk, 2)];
+            }
+            
+            // Add padding to make length divisible by 8
+            const paddingLength = (8 - (result.length % 8)) % 8;
+            result += '='.repeat(paddingLength);
+            
+            return result;
+        }
+
+        function base32Decode(input) {
+            if (!input) return '';
+            
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            
+            // Remove padding and convert to uppercase
+            input = input.replace(/=/g, '').toUpperCase();
+            
+            let bits = '';
+            
+            // Convert each character to 5-bit binary
+            for (let i = 0; i < input.length; i++) {
+                const index = alphabet.indexOf(input[i]);
+                if (index === -1) {
+                    throw new Error(`Invalid Base32 character: ${input[i]}`);
+                }
+                bits += index.toString(2).padStart(5, '0');
+            }
+            
+            // Convert binary string back to bytes
+            const bytes = [];
+            for (let i = 0; i + 8 <= bits.length; i += 8) {
+                const byte = bits.slice(i, i + 8);
+                bytes.push(parseInt(byte, 2));
+            }
+            
+            // Convert bytes to string
+            return new TextDecoder().decode(new Uint8Array(bytes));
+        }
+
+        // Base58 encoding/decoding functions
+        function base58Encode(input) {
+            const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            const bytes = new TextEncoder().encode(input);
+            
+            let num = 0n;
+            for (let i = 0; i < bytes.length; i++) {
+                num = num * 256n + BigInt(bytes[i]);
+            }
+            
+            let result = '';
+            while (num > 0) {
+                result = alphabet[Number(num % 58n)] + result;
+                num = num / 58n;
+            }
+            
+            // Handle leading zeros
+            for (let i = 0; i < bytes.length && bytes[i] === 0; i++) {
+                result = '1' + result;
+            }
+            
+            return result;
+        }
+
+        function base58Decode(input) {
+            const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            let num = 0n;
+            
+            for (let i = 0; i < input.length; i++) {
+                const index = alphabet.indexOf(input[i]);
+                if (index === -1) throw new Error('Invalid Base58 character');
+                num = num * 58n + BigInt(index);
+            }
+            
+            const bytes = [];
+            while (num > 0) {
+                bytes.unshift(Number(num % 256n));
+                num = num / 256n;
+            }
+            
+            // Handle leading '1's
+            for (let i = 0; i < input.length && input[i] === '1'; i++) {
+                bytes.unshift(0);
+            }
+            
+            return new TextDecoder().decode(new Uint8Array(bytes));
+        }
+
+        // HTML encoding/decoding functions
+        function htmlEncode(input) {
+            return input
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function htmlDecode(input) {
+            return input
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'");
+        }
+
+        // String to hex and hex to string
+        function stringToHex(str) {
+            return Array.from(str).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToString(hex) {
+            return hex.replace(/[^0-9a-f]/gi, '').replace(/(..)/g, (match, p1) => String.fromCharCode(parseInt(p1, 16)));
+        }
+
+        // Case conversion functions
+        function toCamelCase(str) {
+            return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+                return index === 0 ? word.toLowerCase() : word.toUpperCase();
+            }).replace(/\s+/g, '');
+        }
+
+        function toPascalCase(str) {
+            return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word) => {
+                return word.toUpperCase();
+            }).replace(/\s+/g, '');
+        }
+
+        function toSnakeCase(str) {
+            return str.toLowerCase().replace(/\s+/g, '_');
+        }
+
+        function toKebabCase(str) {
+            return str.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function toConstantCase(str) {
+            return str.toUpperCase().replace(/\s+/g, '_');
+        }
+
+        // JSON and XML utilities
+        function validateJSON(input) {
+            try {
+                JSON.parse(input);
+                return 'Valid JSON';
+            } catch (error) {
+                return 'Invalid JSON: ' + error.message;
+            }
+        }
+
+        function validateXML(input) {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(input, 'text/xml');
+                const errors = doc.getElementsByTagName('parsererror');
+                if (errors.length > 0) {
+                    return 'Invalid XML: ' + errors[0].textContent;
+                }
+                return 'Valid XML';
+            } catch (error) {
+                return 'Invalid XML: ' + error.message;
+            }
+        }
+
+        function minifyXML(input) {
+            return input.replace(/>\s+</g, '><').trim();
+        }
+
+        function formatXML(xml) {
+            const PADDING = '  ';
+            const reg = /(>)(<)(\/*)/g;
+            let pad = 0;
+            
+            xml = xml.replace(reg, '$1\r\n$2$3');
+            
+            return xml.split('\r\n').map((node) => {
+                let indent = 0;
+                if (node.match(/.+<\/\w[^>]*>$/)) {
+                    indent = 0;
+                } else if (node.match(/^<\/\w/) && pad > 0) {
+                    pad -= 1;
+                } else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                    indent = 1;
+                } else {
+                    indent = 0;
+                }
+                
+                pad += indent;
+                return PADDING.repeat(pad - indent) + node;
+            }).join('\r\n');
+        }
+
+        // QR Code and syntax highlighting
+        function generateQRCode(text) {
+            const qrOutput = document.getElementById('qr-output');
+            const textOutput = document.getElementById('output-text');
+            
+            textOutput.classList.add('hidden');
+            qrOutput.classList.remove('hidden');
+            qrOutput.innerHTML = '';
+            
+            // Get QR code options
+            const size = parseInt(document.getElementById('qr-size')?.value || 256);
+            const errorCorrectionLevel = document.getElementById('qr-error-level')?.value || 'M';
+            const margin = parseInt(document.getElementById('qr-margin')?.value || 4);
+            const colorDark = document.getElementById('qr-color-dark')?.value || '#000000';
+            const colorLight = document.getElementById('qr-color-light')?.value || '#FFFFFF';
+            
+            const options = {
+                width: size,
+                height: size,
+                margin: margin,
+                color: {
+                    dark: colorDark,
+                    light: colorLight
+                },
+                errorCorrectionLevel: errorCorrectionLevel
+            };
+            
+            // Create container for QR code and download options
+            const container = document.createElement('div');
+            container.className = 'text-center space-y-4';
+            
+            QRCode.toCanvas(text, options, function (error, canvas) {
+                if (error) {
+                    qrOutput.innerHTML = '<p class="text-red-500">Error generating QR code: ' + error + '</p>';
+                } else {
+                    container.appendChild(canvas);
+                    
+                    // Add download buttons
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'flex justify-center space-x-2 mt-4';
+                    
+                    // PNG Download
+                    const pngBtn = document.createElement('button');
+                    pngBtn.className = 'bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors';
+                    pngBtn.textContent = 'Download PNG';
+                    pngBtn.onclick = () => downloadQRCode(canvas, 'png');
+                    
+                    // JPEG Download
+                    const jpgBtn = document.createElement('button');
+                    jpgBtn.className = 'bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors';
+                    jpgBtn.textContent = 'Download JPG';
+                    jpgBtn.onclick = () => downloadQRCode(canvas, 'jpeg');
+                    
+                    // SVG Download
+                    const svgBtn = document.createElement('button');
+                    svgBtn.className = 'bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors';
+                    svgBtn.textContent = 'Download SVG';
+                    svgBtn.onclick = () => downloadQRCodeSVG(text, options);
+                    
+                    buttonContainer.appendChild(pngBtn);
+                    buttonContainer.appendChild(jpgBtn);
+                    buttonContainer.appendChild(svgBtn);
+                    container.appendChild(buttonContainer);
+                    
+                    // Add QR code info
+                    const info = document.createElement('div');
+                    info.className = 'text-sm text-gray-600 mt-2';
+                    info.innerHTML = `
+                        <p>Size: ${size}x${size}px</p>
+                        <p>Error Correction: ${errorCorrectionLevel}</p>
+                        <p>Text Length: ${text.length} characters</p>
+                    `;
+                    container.appendChild(info);
+                    
+                    qrOutput.appendChild(container);
+                }
+            });
+        }
+        
+        function downloadQRCode(canvas, format) {
+            const link = document.createElement('a');
+            link.download = `qr-code-${Date.now()}.${format === 'jpeg' ? 'jpg' : format}`;
+            link.href = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.9 : 1.0);
+            link.click();
+        }
+        
+        function downloadQRCodeSVG(text, options) {
+            QRCode.toString(text, {...options, type: 'svg'}, function (error, svg) {
+                if (!error) {
+                    const blob = new Blob([svg], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `qr-code-${Date.now()}.svg`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                }
+            });
+        }
+
+        function showJSONTree(jsonString) {
+            const jsonTree = document.getElementById('json-tree');
+            const textOutput = document.getElementById('output-text');
+            
+            textOutput.classList.add('hidden');
+            jsonTree.classList.remove('hidden');
+            
+            try {
+                const obj = JSON.parse(jsonString);
+                jsonTree.innerHTML = '<pre>' + JSON.stringify(obj, null, 2) + '</pre>';
+            } catch (error) {
+                jsonTree.innerHTML = '<p class="text-red-500">Invalid JSON: ' + error.message + '</p>';
+            }
+        }
+
+        // New Tool Implementations
+        function generatePassword() {
+            const length = parseInt(document.getElementById('password-length')?.value || 16);
+            const includeUpper = document.getElementById('include-uppercase')?.checked !== false;
+            const includeLower = document.getElementById('include-lowercase')?.checked !== false;
+            const includeNumbers = document.getElementById('include-numbers')?.checked !== false;
+            const includeSymbols = document.getElementById('include-symbols')?.checked || false;
+            const excludeAmbiguous = document.getElementById('exclude-ambiguous')?.checked || false;
+            
+            let charset = '';
+            if (includeUpper) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeLower) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (includeNumbers) charset += '0123456789';
+            if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            if (excludeAmbiguous) {
+                charset = charset.replace(/[0O1Il]/g, '');
+            }
+            
+            if (!charset) {
+                document.getElementById('output-text').value = 'Please select at least one character type';
+                return;
+            }
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            
+            const strength = calculatePasswordStrength(password);
+            const output = `Generated Password: ${password}\n\nStrength: ${strength.level}\nScore: ${strength.score}/4\nEstimated crack time: ${strength.crackTime}`;
+            
+            document.getElementById('output-text').value = output;
+        }
+        
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            let level = 'Very Weak';
+            let crackTime = 'Instantly';
+            
+            // Length bonus
+            if (password.length >= 8) score++;
+            if (password.length >= 12) score++;
+            
+            // Character variety
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            // Adjust score based on length
+            score = Math.min(4, score);
+            
+            switch (score) {
+                case 0:
+                case 1:
+                    level = 'Very Weak';
+                    crackTime = 'Instantly';
+                    break;
+                case 2:
+                    level = 'Weak';
+                    crackTime = 'Minutes to hours';
+                    break;
+                case 3:
+                    level = 'Medium';
+                    crackTime = 'Days to months';
+                    break;
+                case 4:
+                    level = 'Strong';
+                    crackTime = 'Years to centuries';
+                    break;
+            }
+            
+            return { score, level, crackTime };
+        }
+
+        function generateUUID() {
+            const version = document.getElementById('uuid-version')?.value || 'v4';
+            let uuid;
+            
+            if (version === 'v4') {
+                uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            } else if (version === 'v1') {
+                // Simplified v1 UUID (timestamp-based)
+                const timestamp = Date.now();
+                const timeHex = timestamp.toString(16).padStart(12, '0');
+                const randomPart = Math.random().toString(16).slice(2, 14);
+                uuid = `${timeHex.slice(0, 8)}-${timeHex.slice(8, 12)}-1${randomPart.slice(0, 3)}-${randomPart.slice(3, 7)}-${randomPart.slice(7, 11)}${Math.random().toString(16).slice(2, 6)}`;
+            }
+            
+            const count = parseInt(document.getElementById('uuid-count')?.value || 1);
+            let result = '';
+            
+            for (let i = 0; i < count; i++) {
+                if (i > 0) result += '\n';
+                if (version === 'v4') {
+                    result += 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        const r = Math.random() * 16 | 0;
+                        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                } else {
+                    result += uuid;
+                }
+            }
+            
+            document.getElementById('output-text').value = result;
+        }
+
+        function showTextDiff() {
+            const output = document.getElementById('output-text');
+            output.classList.add('hidden');
+            
+            const diffContainer = document.createElement('div');
+            diffContainer.className = 'text-diff-container';
+            diffContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Original Text</label>
+                        <textarea id="diff-text1" rows="10" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter original text"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Modified Text</label>
+                        <textarea id="diff-text2" rows="10" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter modified text"></textarea>
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    <button onclick="calculateDiff()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        Compare Texts
+                    </button>
+                </div>
+                <div id="diff-results" class="border border-gray-300 rounded-lg p-4 min-h-32 bg-gray-50"></div>
+            `;
+            
+            output.parentNode.insertBefore(diffContainer, output);
+        }
+        
+        function calculateDiff() {
+            const text1 = document.getElementById('diff-text1').value;
+            const text2 = document.getElementById('diff-text2').value;
+            const resultsDiv = document.getElementById('diff-results');
+            
+            const lines1 = text1.split('\n');
+            const lines2 = text2.split('\n');
+            
+            let diffHTML = '';
+            const maxLines = Math.max(lines1.length, lines2.length);
+            
+            for (let i = 0; i < maxLines; i++) {
+                const line1 = lines1[i] || '';
+                const line2 = lines2[i] || '';
+                
+                if (line1 === line2) {
+                    diffHTML += `<div class="diff-line unchanged"><span class="line-number">${i + 1}</span><span class="line-content">${escapeHtml(line1)}</span></div>`;
+                } else {
+                    if (line1) {
+                        diffHTML += `<div class="diff-line removed"><span class="line-number">-${i + 1}</span><span class="line-content">${escapeHtml(line1)}</span></div>`;
+                    }
+                    if (line2) {
+                        diffHTML += `<div class="diff-line added"><span class="line-number">+${i + 1}</span><span class="line-content">${escapeHtml(line2)}</span></div>`;
+                    }
+                }
+            }
+            
+            resultsDiv.innerHTML = diffHTML || '<p class="text-gray-500">No differences found</p>';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateLoremIpsum() {
+            const type = document.getElementById('lorem-type')?.value || 'paragraphs';
+            const count = parseInt(document.getElementById('lorem-count')?.value || 3);
+            const startWithLorem = document.getElementById('start-with-lorem')?.checked !== false;
+            
+            const loremWords = [
+                'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
+                'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
+                'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud',
+                'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo',
+                'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit', 'voluptate',
+                'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint',
+                'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia',
+                'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum'
+            ];
+            
+            let result = '';
+            
+            switch (type) {
+                case 'words':
+                    const words = [];
+                    if (startWithLorem) words.push('Lorem', 'ipsum');
+                    for (let i = words.length; i < count; i++) {
+                        words.push(loremWords[Math.floor(Math.random() * loremWords.length)]);
+                    }
+                    result = words.join(' ');
+                    break;
+                    
+                case 'sentences':
+                    for (let i = 0; i < count; i++) {
+                        const sentenceLength = 8 + Math.floor(Math.random() * 12);
+                        const sentence = [];
+                        
+                        if (i === 0 && startWithLorem) {
+                            sentence.push('Lorem', 'ipsum');
+                        }
+                        
+                        for (let j = sentence.length; j < sentenceLength; j++) {
+                            sentence.push(loremWords[Math.floor(Math.random() * loremWords.length)]);
+                        }
+                        
+                        sentence[0] = sentence[0].charAt(0).toUpperCase() + sentence[0].slice(1);
+                        result += sentence.join(' ') + '. ';
+                    }
+                    break;
+                    
+                case 'paragraphs':
+                default:
+                    for (let i = 0; i < count; i++) {
+                        const paragraphLength = 3 + Math.floor(Math.random() * 5);
+                        const sentences = [];
+                        
+                        for (let j = 0; j < paragraphLength; j++) {
+                            const sentenceLength = 8 + Math.floor(Math.random() * 12);
+                            const sentence = [];
+                            
+                            if (i === 0 && j === 0 && startWithLorem) {
+                                sentence.push('Lorem', 'ipsum');
+                            }
+                            
+                            for (let k = sentence.length; k < sentenceLength; k++) {
+                                sentence.push(loremWords[Math.floor(Math.random() * loremWords.length)]);
+                            }
+                            
+                            sentence[0] = sentence[0].charAt(0).toUpperCase() + sentence[0].slice(1);
+                            sentences.push(sentence.join(' '));
+                        }
+                        
+                        result += sentences.join('. ') + '.\n\n';
+                    }
+                    break;
+            }
+            
+            document.getElementById('output-text').value = result.trim();
+        }
+
+        function countWords(text) {
+            if (!text.trim()) return 'No text provided';
+            
+            const characters = text.length;
+            const charactersNoSpaces = text.replace(/\s/g, '').length;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0).length;
+            const lines = text.split('\n').length;
+            
+            return `Text Statistics:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Characters (with spaces): ${characters.toLocaleString()}
+Characters (without spaces): ${charactersNoSpaces.toLocaleString()}
+Words: ${words.toLocaleString()}
+Sentences: ${sentences.toLocaleString()}
+Paragraphs: ${paragraphs.toLocaleString()}
+Lines: ${lines.toLocaleString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Reading Time Estimates:
+Average reading speed: ~${Math.ceil(words / 200)} minutes
+Fast reading speed: ~${Math.ceil(words / 300)} minutes
+Slow reading speed: ~${Math.ceil(words / 150)} minutes
+
+Additional Information:
+Average word length: ${words > 0 ? (charactersNoSpaces / words).toFixed(1) : 0} characters
+Average sentence length: ${sentences > 0 ? (words / sentences).toFixed(1) : 0} words
+Most common word length: ${findMostCommonWordLength(text)} characters`;
+        }
+        
+        function findMostCommonWordLength(text) {
+            const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+            const lengthCounts = {};
+            
+            words.forEach(word => {
+                const length = word.length;
+                lengthCounts[length] = (lengthCounts[length] || 0) + 1;
+            });
+            
+            let maxCount = 0;
+            let mostCommonLength = 0;
+            
+            for (const [length, count] of Object.entries(lengthCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostCommonLength = parseInt(length);
+                }
+            }
+            
+            return mostCommonLength;
+        }
+
+        function convertTimestamp(input) {
+            if (!input.trim()) {
+                const now = Date.now();
+                return `Current Timestamp Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Unix Timestamp (seconds): ${Math.floor(now / 1000)}
+Unix Timestamp (milliseconds): ${now}
+ISO 8601: ${new Date(now).toISOString()}
+UTC: ${new Date(now).toUTCString()}
+Local Time: ${new Date(now).toString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+            }
+            
+            let timestamp = input.trim();
+            let result = '';
+            
+            try {
+                let date;
+                
+                // Try parsing as Unix timestamp (seconds)
+                if (/^\d{10}$/.test(timestamp)) {
+                    date = new Date(parseInt(timestamp) * 1000);
+                }
+                // Try parsing as Unix timestamp (milliseconds)
+                else if (/^\d{13}$/.test(timestamp)) {
+                    date = new Date(parseInt(timestamp));
+                }
+                // Try parsing as ISO string or other formats
+                else {
+                    date = new Date(timestamp);
+                }
+                
+                if (isNaN(date.getTime())) {
+                    throw new Error('Invalid date format');
+                }
+                
+                const unixSeconds = Math.floor(date.getTime() / 1000);
+                const unixMilliseconds = date.getTime();
+                
+                result = `Timestamp Conversion Results:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Input: ${timestamp}
+
+Unix Timestamp (seconds): ${unixSeconds}
+Unix Timestamp (milliseconds): ${unixMilliseconds}
+ISO 8601: ${date.toISOString()}
+UTC: ${date.toUTCString()}
+Local Time: ${date.toString()}
+Local Date: ${date.toLocaleDateString()}
+Local Time Only: ${date.toLocaleTimeString()}
+
+Relative Time: ${getRelativeTime(date)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+                
+            } catch (error) {
+                result = `Error: ${error.message}
+
+Supported formats:
+• Unix timestamp (seconds): 1640995200
+• Unix timestamp (milliseconds): 1640995200000  
+• ISO 8601: 2022-01-01T00:00:00.000Z
+• RFC 2822: Sat, 01 Jan 2022 00:00:00 GMT
+• Common formats: 2022-01-01, 01/01/2022, etc.`;
+            }
+            
+            return result;
+        }
+        
+        function getRelativeTime(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (Math.abs(diffSecs) < 60) return `${diffSecs} seconds ago`;
+            if (Math.abs(diffMins) < 60) return `${diffMins} minutes ago`;
+            if (Math.abs(diffHours) < 24) return `${diffHours} hours ago`;
+            if (Math.abs(diffDays) < 30) return `${diffDays} days ago`;
+            if (Math.abs(diffDays) < 365) return `${Math.floor(diffDays / 30)} months ago`;
+            return `${Math.floor(diffDays / 365)} years ago`;
+        }
+
+        function generateRandomNumber() {
+            const min = parseInt(document.getElementById('random-min')?.value || 1);
+            const max = parseInt(document.getElementById('random-max')?.value || 100);
+            const count = parseInt(document.getElementById('random-count')?.value || 1);
+            const allowDuplicates = document.getElementById('allow-duplicates')?.checked !== false;
+            const format = document.getElementById('number-format')?.value || 'integer';
+            
+            if (min >= max) {
+                document.getElementById('output-text').value = 'Error: Minimum value must be less than maximum value';
+                return;
+            }
+            
+            let numbers = [];
+            const range = max - min + 1;
+            
+            if (!allowDuplicates && count > range && format === 'integer') {
+                document.getElementById('output-text').value = `Error: Cannot generate ${count} unique numbers in range ${min}-${max}`;
+                return;
+            }
+            
+            for (let i = 0; i < count; i++) {
+                let number;
+                
+                if (format === 'integer') {
+                    do {
+                        number = Math.floor(Math.random() * (max - min + 1)) + min;
+                    } while (!allowDuplicates && numbers.includes(number));
+                } else if (format === 'decimal') {
+                    const decimals = parseInt(document.getElementById('decimal-places')?.value || 2);
+                    number = (Math.random() * (max - min) + min).toFixed(decimals);
+                }
+                
+                numbers.push(number);
+            }
+            
+            const result = `Generated ${count} random number${count > 1 ? 's' : ''}:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${numbers.join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Statistics:
+Range: ${min} - ${max}
+Count: ${count}
+Sum: ${numbers.reduce((a, b) => parseFloat(a) + parseFloat(b), 0)}
+Average: ${(numbers.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / count).toFixed(2)}
+Min Generated: ${Math.min(...numbers.map(n => parseFloat(n)))}
+Max Generated: ${Math.max(...numbers.map(n => parseFloat(n)))}`;
+            
+            document.getElementById('output-text').value = result;
+        }
+
+        // Text Tool Functions
+        function replaceText(input) {
+            const findText = document.getElementById('find-text')?.value || '';
+            const replaceWith = document.getElementById('replace-text')?.value || '';
+            const useRegex = document.getElementById('use-regex')?.checked || false;
+            const caseSensitive = document.getElementById('case-sensitive')?.checked || false;
+            
+            if (!findText) return 'Please enter text to find';
+            
+            try {
+                if (useRegex) {
+                    const flags = caseSensitive ? 'g' : 'gi';
+                    const regex = new RegExp(findText, flags);
+                    return input.replace(regex, replaceWith);
+                } else {
+                    const flags = caseSensitive ? 'g' : 'gi';
+                    const regex = new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+                    return input.replace(regex, replaceWith);
+                }
+            } catch (error) {
+                return 'Error: Invalid regular expression - ' + error.message;
+            }
+        }
+
+        function sortText(input) {
+            const sortType = document.getElementById('sort-type')?.value || 'alphabetical';
+            const sortOrder = document.getElementById('sort-order')?.value || 'ascending';
+            const caseInsensitive = document.getElementById('case-insensitive')?.checked !== false;
+            
+            const lines = input.split('\n');
+            
+            let sortedLines;
+            switch (sortType) {
+                case 'alphabetical':
+                    if (caseInsensitive) {
+                        sortedLines = lines.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+                    } else {
+                        sortedLines = lines.sort((a, b) => a.localeCompare(b));
+                    }
+                    break;
+                case 'numerical':
+                    sortedLines = lines.sort((a, b) => {
+                        const numA = parseFloat(a.trim());
+                        const numB = parseFloat(b.trim());
+                        if (isNaN(numA) && isNaN(numB)) return 0;
+                        if (isNaN(numA)) return 1;
+                        if (isNaN(numB)) return -1;
+                        return numA - numB;
+                    });
+                    break;
+                case 'length':
+                    sortedLines = lines.sort((a, b) => a.length - b.length);
+                    break;
+                default:
+                    sortedLines = lines;
+            }
+            
+            if (sortOrder === 'descending') {
+                sortedLines.reverse();
+            }
+            
+            return sortedLines.join('\n');
+        }
+
+        function removeDuplicateLines(input) {
+            const caseInsensitive = document.getElementById('case-insensitive-dup')?.checked !== false;
+            const trimWhitespace = document.getElementById('trim-whitespace')?.checked !== false;
+            
+            const lines = input.split('\n');
+            const seen = new Set();
+            const result = [];
+            
+            for (let line of lines) {
+                let processedLine = trimWhitespace ? line.trim() : line;
+                let key = caseInsensitive ? processedLine.toLowerCase() : processedLine;
+                
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    result.push(line);
+                }
+            }
+            
+            return result.join('\n');
+        }
+
+        function processLineNumbers(input) {
+            const action = document.getElementById('number-action')?.value || 'add';
+            const startNumber = parseInt(document.getElementById('start-number')?.value || 1);
+            const format = document.getElementById('number-format-style')?.value || 'number';
+            
+            const lines = input.split('\n');
+            
+            if (action === 'remove') {
+                // Remove line numbers (remove patterns like "1. ", "[1] ", "(1) ", "01. " from start of lines)
+                return lines.map(line => {
+                    return line.replace(/^\s*(\d+\.|\[\d+\]|\(\d+\)|0*\d+\.)\s*/, '');
+                }).join('\n');
+            } else {
+                // Add line numbers
+                return lines.map((line, index) => {
+                    const lineNumber = startNumber + index;
+                    let prefix;
+                    
+                    switch (format) {
+                        case 'padded':
+                            const padLength = Math.max(2, String(startNumber + lines.length - 1).length);
+                            prefix = String(lineNumber).padStart(padLength, '0') + '. ';
+                            break;
+                        case 'parentheses':
+                            prefix = `(${lineNumber}) `;
+                            break;
+                        case 'brackets':
+                            prefix = `[${lineNumber}] `;
+                            break;
+                        default:
+                            prefix = `${lineNumber}. `;
+                    }
+                    
+                    return prefix + line;
+                }).join('\n');
+            }
+        }
+
+        function reverseText(input) {
+            const reverseType = document.getElementById('reverse-type')?.value || 'characters';
+            const preservePunctuation = document.getElementById('preserve-punctuation')?.checked || false;
+            
+            switch (reverseType) {
+                case 'characters':
+                    return input.split('').reverse().join('');
+                case 'words':
+                    const words = input.split(/(\s+)/);
+                    const reversedWords = words.map(word => {
+                        if (/^\s+$/.test(word)) return word; // Keep whitespace as is
+                        return word.split('').reverse().join('');
+                    });
+                    return reversedWords.join('');
+                case 'lines':
+                    return input.split('\n').reverse().join('\n');
+                case 'word-order':
+                    if (preservePunctuation) {
+                        // More complex logic to preserve punctuation
+                        const sentences = input.split(/([.!?]+)/);
+                        return sentences.map(sentence => {
+                            if (/[.!?]+/.test(sentence)) return sentence;
+                            return sentence.trim().split(/\s+/).reverse().join(' ');
+                        }).join('');
+                    } else {
+                        return input.split(/\s+/).reverse().join(' ');
+                    }
+                default:
+                    return input;
+            }
+        }
+
+        function formatText(input) {
+            const action = document.getElementById('format-action')?.value || 'trim';
+            const wrapWidth = parseInt(document.getElementById('wrap-width')?.value || 80);
+            
+            switch (action) {
+                case 'trim':
+                    return input.split('\n').map(line => line.trim()).join('\n');
+                case 'title':
+                    return input.replace(/\w\S*/g, (txt) => 
+                        txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+                    );
+                case 'sentence':
+                    return input.toLowerCase().replace(/(^\w|\.\s+\w)/g, (txt) => 
+                        txt.toUpperCase()
+                    );
+                case 'extract-emails':
+                    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+                    const emails = input.match(emailRegex) || [];
+                    return emails.join('\n');
+                case 'extract-urls':
+                    const urlRegex = /https?:\/\/[^\s]+/g;
+                    const urls = input.match(urlRegex) || [];
+                    return urls.join('\n');
+                case 'remove-extra-spaces':
+                    return input.replace(/\s+/g, ' ').trim();
+                case 'wrap-text':
+                    const words = input.split(' ');
+                    const lines = [];
+                    let currentLine = '';
+                    
+                    for (const word of words) {
+                        if ((currentLine + word).length <= wrapWidth) {
+                            currentLine += (currentLine ? ' ' : '') + word;
+                        } else {
+                            if (currentLine) lines.push(currentLine);
+                            currentLine = word;
+                        }
+                    }
+                    if (currentLine) lines.push(currentLine);
+                    return lines.join('\n');
+                default:
+                    return input;
+            }
+        }
+
+        // Search functionality
+        function searchTools(query) {
+            const tools = document.querySelectorAll('.tool-card');
+            const searchTerm = query.toLowerCase().trim();
+            
+            tools.forEach(tool => {
+                const title = tool.querySelector('h3').textContent.toLowerCase();
+                const description = tool.querySelector('p').textContent.toLowerCase();
+                
+                if (searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm)) {
+                    tool.style.display = 'block';
+                } else {
+                    tool.style.display = 'none';
+                }
+            });
+            
+            // Reset category button styles when searching
+            if (searchTerm !== '') {
+                const buttons = document.querySelectorAll('.category-btn');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                document.querySelector('.category-btn').classList.remove('bg-gray-200', 'text-gray-700');
+                document.querySelector('.category-btn').classList.add('bg-blue-500', 'text-white');
+            }
+        }
+    </script>
+</body>
+</html>
+
